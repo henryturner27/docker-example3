@@ -17,13 +17,14 @@ class Message(db.Model):
 
 @app.route('/')
 def index():
-    response = jsonify(Message.query.get(1).message)
+    response = jsonify(db.session.execute(db.select(Message).order_by(Message.id.desc())).scalar().message)
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
 
 if __name__ == "__main__":
-    db.create_all()
-    db.session.add(Message(message='This is my stored message!'))
-    db.session.commit()
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    with app.app_context():
+        db.create_all()
+        db.session.add(Message(message='This is my third stored message!'))
+        db.session.commit()
+        app.run(debug=True, host='0.0.0.0', port=8000)
